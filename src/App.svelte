@@ -1,9 +1,9 @@
 <script>
     import Grid from "./Grid.svelte"
-    import { Icon } from 'svelte-awesome'
-    import refresh from 'svelte-awesome/icons/refresh'
-    import pause from 'svelte-awesome/icons/pause'
-    import play from 'svelte-awesome/icons/play'
+    import { Icon } from "svelte-awesome"
+    import refresh from "svelte-awesome/icons/refresh"
+    import pause from "svelte-awesome/icons/pause"
+    import play from "svelte-awesome/icons/play"
 
     let godPlay = false
 
@@ -18,7 +18,7 @@
             return
         }
         // Create a new grid to store the updated cell states
-        let newGrid = grid.map((row) => row.slice())
+        let newGrid = grid.map((row) => row.slice());
         // Loop through each cell in the grid
         for (let row = 0; row < grid.length; row++) {
             for (let col = 0; col < grid[row].length; col++) {
@@ -28,10 +28,10 @@
                 // Update the cell's state based on the rules of the Game of Life
                 if (grid[row][col] === 1) {
                     // Rule 1: Any live cell with fewer than two live neighbors dies
-                    if (liveNeighbors < 2) newGrid[row][col] = 0
+                    if (liveNeighbors < 2) newGrid[row][col] = 0;
                     // Rule 2: Any live cell with two or three live neighbors lives on
                     else if (liveNeighbors === 2 || liveNeighbors === 3)
-                        newGrid[row][col] = 1;
+                        newGrid[row][col] = 1
                     // Rule 3: Any live cell with more than three live neighbors dies
                     else if (liveNeighbors > 3) newGrid[row][col] = 0
                 } else {
@@ -67,13 +67,16 @@
         // Return the number of live neighbors
         return liveNeighbors
     }
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener("keydown", function (e) {
         switch (e.key) {
-            case 'r':
+            case "r":
                 reset()
                 break
+            case " ":
+                godPlay = !godPlay
+                break
         }
-    })
+    });
     function reset() {
         godPlay = false
         size = defaultSize
@@ -86,40 +89,87 @@
     let interval = setInterval(tick, 1000 / lifespan) // Update the grid every second
 </script>
 
-<div class="ui">
-    <img src="../favicon.png" alt="logo" class="logo">
-    <button on:click={() => (godPlay = !godPlay)}>
-        {#if godPlay}
-            <Icon data={play}/>
-        {:else}
-            <Icon data={pause}/>
-        {/if}
-    </button>
-    <button on:click={reset}><Icon data={refresh}/></button>
-    <input type="range" min="1" max="50" bind:value={lifespan} on:input={slide} />
-    <span>x{(lifespan / 10)}</span>
-    <input type="range" min="5" max="100" bind:value={size} />
-    <span>x{size}</span>
+<div class="menu">
+    <img src="../favicon.png" alt="logo" class="logo" />
+    <div class="ui">
+        <button on:click={() => (godPlay = !godPlay)}>
+            {#if godPlay}
+                <Icon data={play} />
+            {:else}
+                <Icon data={pause} />
+            {/if}
+        </button>
+        <button on:click={reset}><Icon data={refresh} /></button>
+        <div class="range-container">
+            <span>Speed x{lifespan / 10}</span>
+            <input
+                type="range"
+                min="1"
+                max="50"
+                bind:value={lifespan}
+                on:input={slide}
+            />
+        </div>
+        <div class="range-container">
+            <span>Size {size}x{size}</span>
+            <input type="range" min="10" max="100" step="10" bind:value={size} />
+        </div>
+    </div>
 </div>
 <Grid {grid} />
 
 <style>
-    .logo{
+    .menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    .logo {
         width: 40px;
+        height: 40px;
     }
     .ui {
         margin: auto;
-        width: fit-content;
         display: flex;
-        gap: 20px;
+        gap: 10px;
         align-items: center;
         padding: 10px;
+        overflow-y: scroll;
     }
-    button{
+    button {
         display: flex;
         margin: 0;
     }
-    input{
+    input {
         margin: 0;
+    }
+    input[type="range"] {
+        -webkit-appearance: none; /*nécessaire pour Chrome */
+        padding: 0; /* nécessaire pour IE */
+        font: inherit; /* même rendu suivant font document */
+        outline: none;
+        color: #069;
+        opacity: 0.3;
+        background: #ccc; /* sert pour couleur de fond de la zone de déplacement */
+        box-sizing: border-box; /* même modèle de boîte pour tous */
+        transition: opacity 0.2s;
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        background-color: #ccc
+    }
+    input[type="range"]::-ms-thumb {
+        background: yellow;
+        border: none;
+    }
+    .range-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .range-container > span {
+        position: absolute;
     }
 </style>
